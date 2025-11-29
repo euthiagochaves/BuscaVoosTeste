@@ -98,12 +98,17 @@ public static class DuffelResponseMapper
     /// <remarks>
     /// Este método realiza as seguintes transformações:
     /// - Gera um novo GUID para o Id da oferta;
-    /// - Extrai origem e destino do primeiro trecho;
-    /// - Extrai partida do primeiro segmento e chegada do último;
+    /// - Extrai origem e destino do primeiro trecho (ida);
+    /// - Extrai partida do primeiro segmento e chegada do último segmento do trecho;
     /// - Converte duração total a partir do primeiro trecho;
     /// - Converte preço total para o value object Money;
     /// - Converte a classe de cabine para o formato interno;
-    /// - Mapeia todos os segmentos do primeiro trecho.
+    /// - Mapeia todos os segmentos do primeiro trecho (ida).
+    /// 
+    /// Nota: Cada trecho na resposta da Duffel representa uma parte do itinerário
+    /// (ida ou volta). Este mapeamento considera apenas o primeiro trecho (ida)
+    /// para criar uma FlightOffer. Se houver trecho de volta, ele seria mapeado
+    /// separadamente em uma implementação de viagem de ida e volta.
     /// </remarks>
     private static FlightOffer? MapearOferta(DuffelOfferResponseDto.OfertaDto ofertaDto)
     {
@@ -122,11 +127,11 @@ public static class DuffelResponseMapper
             return null;
         }
 
-        // Extrair dados do primeiro e último segmento
+        // Extrair dados do primeiro e último segmento do trecho de ida
         var primeiroSegmento = primeiroTrecho.Segmentos.First();
-        var ultimoSegmento = primeiroTrecho.Segmentos.Last();
+        var ultimoSegmentoDoTrecho = primeiroTrecho.Segmentos.Last();
 
-        // Mapear segmentos de todos os trechos para entidades de domínio
+        // Mapear segmentos do trecho de ida para entidades de domínio
         var segmentosDominio = MapearSegmentos(primeiroTrecho.Segmentos);
 
         // Se não houver segmentos válidos, retornar null
@@ -150,7 +155,7 @@ public static class DuffelResponseMapper
             origemIata: primeiroTrecho.OrigemIata,
             destinoIata: primeiroTrecho.DestinoIata,
             partida: primeiroSegmento.Partida,
-            chegada: ultimoSegmento.Chegada,
+            chegada: ultimoSegmentoDoTrecho.Chegada,
             duracaoTotal: duracaoTotal,
             precoTotal: precoTotal,
             companhiaAereaCodigo: ofertaDto.CompanhiaAereaCodigo,
@@ -264,20 +269,22 @@ public static class DuffelResponseMapper
     /// <returns>
     /// Value object Money com o valor e moeda mapeados.
     /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Lançada quando a moeda é nula ou vazia.
-    /// </exception>
     /// <remarks>
+    /// Este método aplica as seguintes normalizações defensivas:
+    /// - Valores negativos são tratados como 0 (não deveria ocorrer em uma API válida);
+    /// - Moedas vazias ou nulas são substituídas por "BRL" como padrão.
+    /// 
     /// O value object Money garante que:
-    /// - O valor não seja negativo;
+    /// - O valor não seja negativo (validado no construtor);
     /// - A moeda seja normalizada para maiúsculas.
     /// </remarks>
     private static Money MapearPreco(decimal valor, string moeda)
     {
-        // Garantir que o valor não seja negativo
+        // Normalização defensiva: valores negativos não são esperados da API da Duffel,
+        // mas tratamos como 0 para evitar exceções no construtor de Money.
         var valorNormalizado = valor >= 0 ? valor : 0;
 
-        // Garantir que a moeda tenha um valor padrão se não informada
+        // Normalização defensiva: usar BRL como moeda padrão se não informada
         var moedaNormalizada = string.IsNullOrWhiteSpace(moeda) ? "BRL" : moeda;
 
         return new Money(valorNormalizado, moedaNormalizada);
