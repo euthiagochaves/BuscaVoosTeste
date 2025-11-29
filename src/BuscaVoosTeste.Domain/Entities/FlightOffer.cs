@@ -139,6 +139,8 @@ public sealed class FlightOffer
         ValidarId(id);
         ValidarCodigoIata(origemIata, nameof(origemIata));
         ValidarCodigoIata(destinoIata, nameof(destinoIata));
+        ValidarCompanhiaAereaCodigo(companhiaAereaCodigo);
+        ValidarSegmentos(segmentos);
 
         var origemIataNormalizado = origemIata.ToUpperInvariant();
         var destinoIataNormalizado = destinoIata.ToUpperInvariant();
@@ -146,8 +148,6 @@ public sealed class FlightOffer
 
         ValidarOrigemDestinoDistintos(origemIataNormalizado, destinoIataNormalizado);
         ValidarHorarios(partida, chegada);
-        ValidarCompanhiaAereaCodigo(companhiaAereaCodigo);
-        ValidarSegmentos(segmentos);
 
         return new FlightOffer(
             id,
