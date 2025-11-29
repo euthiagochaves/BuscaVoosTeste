@@ -1,5 +1,7 @@
 using BuscaVoosTeste.Application;
+using BuscaVoosTeste.Application.UseCases.BuscarVoos;
 using BuscaVoosTeste.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,5 +30,33 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// =============================================================================
+// Endpoint de busca de voos
+// =============================================================================
+
+app.MapGet("/api/voos/busca", async (
+    [FromServices] IBuscarVoosUseCase useCase,
+    [FromQuery] string origem,
+    [FromQuery] string destino,
+    [FromQuery] DateTime dataIda,
+    [FromQuery] DateTime? dataVolta,
+    [FromQuery] int passageiros,
+    [FromQuery] string? cabine,
+    CancellationToken cancellationToken) =>
+{
+    var input = new BuscarVoosInput
+    {
+        OrigemIata = origem,
+        DestinoIata = destino,
+        DataIda = dataIda,
+        DataVolta = dataVolta,
+        Passageiros = passageiros <= 0 ? 1 : passageiros,
+        Cabine = cabine
+    };
+
+    var ofertas = await useCase.ExecuteAsync(input, cancellationToken);
+    return Results.Ok(ofertas);
+});
 
 app.Run();
