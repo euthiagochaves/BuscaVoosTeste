@@ -181,11 +181,24 @@ public sealed class DuffelHttpClient : IDuffelHttpClient
             Partida = segment.DepartingAt,
             Chegada = segment.ArrivingAt,
             Duracao = segment.Duration,
-            NumeroVoo = $"{segment.MarketingCarrier?.IataCode ?? string.Empty}{segment.MarketingCarrierFlightNumber ?? string.Empty}",
+            NumeroVoo = ConstruirNumeroVoo(segment.MarketingCarrier?.IataCode, segment.MarketingCarrierFlightNumber),
             CompanhiaAereaCodigo = segment.OperatingCarrier?.IataCode ?? segment.MarketingCarrier?.IataCode ?? string.Empty,
             CompanhiaAereaNome = segment.OperatingCarrier?.Name ?? segment.MarketingCarrier?.Name,
             ClasseCabine = segment.Passengers?.FirstOrDefault()?.CabinClass
         }).ToList();
+    }
+
+    /// <summary>
+    /// Constrói o número do voo a partir do código IATA da companhia aérea e do número do voo.
+    /// </summary>
+    private static string ConstruirNumeroVoo(string? codigoIata, string? numeroVoo)
+    {
+        if (string.IsNullOrEmpty(codigoIata) && string.IsNullOrEmpty(numeroVoo))
+        {
+            return string.Empty;
+        }
+
+        return $"{codigoIata ?? string.Empty}{numeroVoo ?? string.Empty}";
     }
 
     /// <summary>
@@ -199,6 +212,9 @@ public sealed class DuffelHttpClient : IDuffelHttpClient
             return [];
         }
 
+        // Nota: A API da Duffel não retorna valores de tarifa individuais por passageiro
+        // no endpoint /air/offer_requests. Os valores de tarifa são disponíveis apenas
+        // em etapas posteriores do fluxo de reserva.
         return passengers.Select(passenger => new DuffelOfferResponseDto.PassageiroRespostaDto
         {
             Id = passenger.Id ?? string.Empty,
