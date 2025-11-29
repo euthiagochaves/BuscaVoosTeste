@@ -1,0 +1,6 @@
+@BuscaVoosTeste.Api_HostAddress = http://localhost:5155
+
+GET {{BuscaVoosTeste.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
