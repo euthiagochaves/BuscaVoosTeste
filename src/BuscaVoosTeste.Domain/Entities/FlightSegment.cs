@@ -99,18 +99,23 @@ public sealed class FlightSegment
     {
         ValidarCodigoIata(origemIata, nameof(origemIata));
         ValidarCodigoIata(destinoIata, nameof(destinoIata));
-        ValidarOrigemDestinoDistintos(origemIata, destinoIata);
+
+        var origemIataNormalizado = origemIata.ToUpperInvariant();
+        var destinoIataNormalizado = destinoIata.ToUpperInvariant();
+        var companhiaAereaCodigoNormalizado = companhiaAereaCodigo.ToUpperInvariant();
+
+        ValidarOrigemDestinoDistintos(origemIataNormalizado, destinoIataNormalizado);
         ValidarHorarios(partida, chegada);
         ValidarNumeroVoo(numeroVoo);
         ValidarCompanhiaAereaCodigo(companhiaAereaCodigo);
 
         return new FlightSegment(
-            origemIata.ToUpperInvariant(),
-            destinoIata.ToUpperInvariant(),
+            origemIataNormalizado,
+            destinoIataNormalizado,
             partida,
             chegada,
             numeroVoo,
-            companhiaAereaCodigo.ToUpperInvariant(),
+            companhiaAereaCodigoNormalizado,
             duracao);
     }
 
