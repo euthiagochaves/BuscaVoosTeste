@@ -8,7 +8,7 @@ namespace BuscaVoosTeste.Infrastructure;
 /// <remarks>
 /// Este DTO é específico da camada de infraestrutura e serve como modelo de transporte
 /// entre a aplicação e o cliente HTTP da Duffel. O mapeamento dos dados de negócio
-/// (BuscarVoosInput) para este DTO é feito pelo DuffelRequestMapper.
+/// (BuscarVoosInput) para este DTO será feito por um mapper de infraestrutura.
 /// </remarks>
 public sealed class DuffelOfferRequestDto
 {
