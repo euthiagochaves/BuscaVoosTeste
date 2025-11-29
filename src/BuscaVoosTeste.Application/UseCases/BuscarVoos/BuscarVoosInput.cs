@@ -18,14 +18,14 @@ public sealed class BuscarVoosInput
     /// Código IATA do aeroporto ou cidade de origem (3 letras).
     /// Parâmetro obrigatório.
     /// </summary>
-    /// <example>GRU, BHZ, GIG</example>
+    /// <example>GRU, CNF, GIG</example>
     public string OrigemIata { get; init; } = default!;
 
     /// <summary>
     /// Código IATA do aeroporto ou cidade de destino (3 letras).
     /// Parâmetro obrigatório.
     /// </summary>
-    /// <example>GRU, BHZ, GIG</example>
+    /// <example>GRU, CNF, GIG</example>
     public string DestinoIata { get; init; } = default!;
 
     /// <summary>
