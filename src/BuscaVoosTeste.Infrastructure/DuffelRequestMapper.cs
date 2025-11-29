@@ -115,6 +115,8 @@ public static class DuffelRequestMapper
     /// </remarks>
     private static IReadOnlyCollection<DuffelOfferRequestDto.PassageiroDto> CriarPassageiros(int quantidadePassageiros)
     {
+        // Garantia defensiva: mesmo que a validação seja feita no use case,
+        // o mapper garante ao menos 1 passageiro para evitar requisições inválidas.
         var quantidade = quantidadePassageiros >= 1 ? quantidadePassageiros : 1;
 
         return Enumerable
