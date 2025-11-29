@@ -6,6 +6,7 @@
 
 using BuscaVoosTeste.Application;
 using BuscaVoosTeste.Infrastructure;
+using BuscaVoosTeste.McpServer.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -32,8 +33,10 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Configuração do servidor MCP via STDIO.
 // O servidor MCP ficará disponível para receber conexões de clientes MCP,
 // como o GitHub Copilot, através do protocolo de comunicação padrão.
+// A Tool 'buscar_voos' é registrada para expor o caso de uso de busca de voos ao agente.
 builder.Services.AddMcpServer()
-    .WithStdioServerTransport();
+    .WithStdioServerTransport()
+    .WithTools<BuscarVoosTool>();
 
 var host = builder.Build();
 
