@@ -19,6 +19,7 @@ public readonly struct Money : IEquatable<Money>
 
     /// <summary>
     /// Código da moeda (ex.: BRL, USD, EUR).
+    /// O código é normalizado para maiúsculas.
     /// </summary>
     public string Moeda { get; }
 
@@ -26,7 +27,7 @@ public readonly struct Money : IEquatable<Money>
     /// Cria uma nova instância de <see cref="Money"/>.
     /// </summary>
     /// <param name="valor">Quantia numérica. Deve ser maior ou igual a zero.</param>
-    /// <param name="moeda">Código da moeda. Não pode ser nulo ou vazio.</param>
+    /// <param name="moeda">Código da moeda. Não pode ser nulo ou vazio. Será normalizado para maiúsculas.</param>
     /// <exception cref="ArgumentException">
     /// Lançada quando o valor é negativo ou a moeda é nula/vazia.
     /// </exception>
@@ -43,7 +44,7 @@ public readonly struct Money : IEquatable<Money>
         }
 
         Valor = valor;
-        Moeda = moeda;
+        Moeda = moeda.ToUpperInvariant();
     }
 
     /// <summary>
