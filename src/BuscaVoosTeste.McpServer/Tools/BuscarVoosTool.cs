@@ -56,12 +56,19 @@ public sealed class BuscarVoosTool
         [Description("Classe de cabine (Economy, PremiumEconomy, Business, First). Opcional")] string? cabine = null,
         CancellationToken cancellationToken = default)
     {
+        ValidarParametrosObrigatorios(origem, destino, dataIda);
+
+        var dataIdaParsed = ParsearData(dataIda, "data de ida");
+        var dataVoltaParsed = !string.IsNullOrEmpty(dataVolta)
+            ? ParsearData(dataVolta, "data de volta")
+            : (DateTime?)null;
+
         var input = new BuscarVoosInput
         {
             OrigemIata = origem,
             DestinoIata = destino,
-            DataIda = DateTime.Parse(dataIda),
-            DataVolta = !string.IsNullOrEmpty(dataVolta) ? DateTime.Parse(dataVolta) : null,
+            DataIda = dataIdaParsed,
+            DataVolta = dataVoltaParsed,
             Passageiros = passageiros,
             Cabine = cabine
         };
@@ -69,5 +76,58 @@ public sealed class BuscarVoosTool
         var ofertas = await _buscarVoosUseCase.ExecuteAsync(input, cancellationToken);
 
         return ofertas;
+    }
+
+    /// <summary>
+    /// Valida os parâmetros obrigatórios da busca de voos.
+    /// </summary>
+    /// <param name="origem">Código IATA de origem.</param>
+    /// <param name="destino">Código IATA de destino.</param>
+    /// <param name="dataIda">Data de ida.</param>
+    /// <exception cref="ArgumentException">
+    /// Lançada quando algum parâmetro obrigatório é nulo ou vazio.
+    /// </exception>
+    private static void ValidarParametrosObrigatorios(string origem, string destino, string dataIda)
+    {
+        if (string.IsNullOrWhiteSpace(origem))
+        {
+            throw new ArgumentException("O código IATA de origem é obrigatório.", nameof(origem));
+        }
+
+        if (string.IsNullOrWhiteSpace(destino))
+        {
+            throw new ArgumentException("O código IATA de destino é obrigatório.", nameof(destino));
+        }
+
+        if (string.IsNullOrWhiteSpace(dataIda))
+        {
+            throw new ArgumentException("A data de ida é obrigatória.", nameof(dataIda));
+        }
+    }
+
+    /// <summary>
+    /// Converte uma string de data no formato ISO (yyyy-MM-dd) para DateTime.
+    /// </summary>
+    /// <param name="data">String com a data no formato ISO.</param>
+    /// <param name="nomeCampo">Nome do campo para mensagem de erro.</param>
+    /// <returns>O DateTime correspondente à data informada.</returns>
+    /// <exception cref="ArgumentException">
+    /// Lançada quando a data não está no formato esperado (yyyy-MM-dd).
+    /// </exception>
+    private static DateTime ParsearData(string data, string nomeCampo)
+    {
+        if (!DateTime.TryParseExact(
+            data,
+            "yyyy-MM-dd",
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None,
+            out var resultado))
+        {
+            throw new ArgumentException(
+                $"A {nomeCampo} '{data}' não está no formato esperado (yyyy-MM-dd).",
+                nomeCampo);
+        }
+
+        return resultado;
     }
 }
