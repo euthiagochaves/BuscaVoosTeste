@@ -1,3 +1,5 @@
+using BuscaVoosTeste.Api.Dtos;
+using BuscaVoosTeste.Api.Middlewares;
 using BuscaVoosTeste.Application;
 using BuscaVoosTeste.Application.UseCases.BuscarVoos;
 using BuscaVoosTeste.Domain.Entities;
@@ -69,6 +71,9 @@ var app = builder.Build();
 // Configuração do pipeline HTTP
 // =============================================================================
 
+// Middleware de tratamento de exceções (deve ser registrado primeiro na pipeline)
+app.UseTratamentoExcecoes();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -109,7 +114,11 @@ app.MapGet("/api/voos/busca", async (
 })
 .WithName("BuscarVoos")
 .Produces<IReadOnlyCollection<FlightOffer>>(StatusCodes.Status200OK, "application/json")
-.Produces(StatusCodes.Status400BadRequest)
-.Produces(StatusCodes.Status500InternalServerError);
+.Produces<RespostaErro>(StatusCodes.Status400BadRequest, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status404NotFound, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status409Conflict, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status500InternalServerError, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status502BadGateway, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status504GatewayTimeout, "application/json");
 
 app.Run();
