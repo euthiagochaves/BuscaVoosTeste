@@ -39,7 +39,7 @@ Exemplo:
 {
   "Duffel": {
     "BaseUrl": "https://api.duffel.com",
-    "AccessToken": "duffel_test_ExXwahWEDyFtaYFM0nWWNQPWPnYYcD4EielQfvoMOXD"
+    "AccessToken": "DUFFEL_ACCESS_TOKEN"
   }
 }
 ```
