@@ -115,6 +115,10 @@ app.MapGet("/api/voos/busca", async (
 .WithName("BuscarVoos")
 .Produces<IReadOnlyCollection<FlightOffer>>(StatusCodes.Status200OK, "application/json")
 .Produces<RespostaErro>(StatusCodes.Status400BadRequest, "application/json")
-.Produces<RespostaErro>(StatusCodes.Status500InternalServerError, "application/json");
+.Produces<RespostaErro>(StatusCodes.Status404NotFound, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status409Conflict, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status500InternalServerError, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status502BadGateway, "application/json")
+.Produces<RespostaErro>(StatusCodes.Status504GatewayTimeout, "application/json");
 
 app.Run();

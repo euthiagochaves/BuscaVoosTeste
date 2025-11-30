@@ -13,10 +13,14 @@ namespace BuscaVoosTeste.Api.Middlewares;
 /// que todas as exceções sejam capturadas e tratadas de forma consistente.
 /// 
 /// Mapeamento de exceções para códigos HTTP:
-/// - ArgumentException / ArgumentNullException → HTTP 400 (Bad Request)
-/// - KeyNotFoundException → HTTP 404 (Not Found)
-/// - InvalidOperationException → HTTP 409 (Conflict)
-/// - Outras exceções → HTTP 500 (Internal Server Error)
+/// - ArgumentNullException → HTTP 400 (Bad Request) - Parâmetro obrigatório não informado
+/// - ArgumentException → HTTP 400 (Bad Request) - Parâmetros de entrada inválidos
+/// - KeyNotFoundException → HTTP 404 (Not Found) - Recurso não encontrado
+/// - InvalidOperationException → HTTP 409 (Conflict) - Conflito de estado
+/// - HttpRequestException → HTTP 502 (Bad Gateway) - Erro de comunicação externa
+/// - TaskCanceledException (cancelada pelo cliente) → HTTP 400 (Bad Request)
+/// - TaskCanceledException (timeout) → HTTP 504 (Gateway Timeout)
+/// - Outras exceções → HTTP 500 (Internal Server Error) - Erro interno genérico
 /// </remarks>
 public class MiddlewareTratamentoExcecoes
 {
@@ -133,7 +137,9 @@ public class MiddlewareTratamentoExcecoes
                     invalidOperationException.Message,
                     identificadorRequisicao)),
 
-            HttpRequestException httpRequestException => (
+            // Nota: A mensagem original do HttpRequestException não é incluída na resposta
+            // por razões de segurança, evitando vazamento de detalhes da infraestrutura.
+            HttpRequestException => (
                 HttpStatusCode.BadGateway,
                 RespostaErro.Criar(
                     CodigoErroInterno,
