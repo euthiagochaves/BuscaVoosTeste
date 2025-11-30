@@ -95,7 +95,7 @@ app.MapGet("/api/voos/busca", async (
     [FromQuery(Name = "destino")] string destino,
     [FromQuery(Name = "dataIda")] DateTime dataIda,
     [FromQuery(Name = "dataVolta")] DateTime? dataVolta,
-    [FromQuery(Name = "passageiros")] int passageiros,
+    [FromQuery(Name = "passageiros")] int? passageiros,
     [FromQuery(Name = "cabine")] string? cabine,
     CancellationToken cancellationToken) =>
 {
@@ -105,7 +105,7 @@ app.MapGet("/api/voos/busca", async (
         DestinoIata = destino,
         DataIda = dataIda,
         DataVolta = dataVolta,
-        Passageiros = passageiros <= 0 ? 1 : passageiros,
+        Passageiros = passageiros.HasValue && passageiros > 0 ? passageiros.Value : 1,
         Cabine = cabine
     };
 
